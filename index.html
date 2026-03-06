@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Тести БЗВП</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hero">
+        <h1>Тести БЗВП</h1>
+        <p>Проходження тестів у браузері з автоматичною перевіркою та збереженням результатів.</p>
+      </header>
+
+      <section id="setup" class="card">
+        <div class="grid">
+          <label>
+            Ваше ім'я
+            <input id="studentName" type="text" maxlength="64" placeholder="Вкажіть ім'я" />
+          </label>
+        </div>
+
+        <button id="startBtn" class="primary">Почати тест</button>
+        <p id="setStats" class="muted"></p>
+      </section>
+
+      <section id="quiz" class="card hidden">
+        <div class="quiz-head">
+          <p id="progress" class="muted"></p>
+          <p id="topic" class="topic"></p>
+        </div>
+
+        <h2 id="questionText"></h2>
+        <form id="optionsForm" class="options"></form>
+
+        <div class="actions">
+          <button id="submitBtn" class="primary" type="button">Перевірити</button>
+          <button id="nextBtn" class="ghost hidden" type="button">Далі</button>
+        </div>
+
+        <p id="feedback" class="feedback"></p>
+      </section>
+
+      <section id="result" class="card hidden">
+        <h2>Результат</h2>
+        <p id="resultText"></p>
+        <p id="saveStatus" class="muted"></p>
+        <button id="restartBtn" class="primary" type="button">Пройти ще раз</button>
+      </section>
+    </main>
+
+    <script src="./supabase-config.js"></script>
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
