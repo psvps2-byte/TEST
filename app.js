@@ -4,7 +4,9 @@ const DATA_URL = "./data/tests.json";
 const DEV_QUESTION_LIMIT = 5;
 
 const studentNameInput = document.getElementById("studentName");
-const setStats = document.getElementById("setStats");
+const studentSurnameInput = document.getElementById("studentSurname");
+const companyNumberInput = document.getElementById("companyNumber");
+const platoonNumberInput = document.getElementById("platoonNumber");
 const startBtn = document.getElementById("startBtn");
 
 const setupSection = document.getElementById("setup");
@@ -47,9 +49,22 @@ function shuffle(arr) {
   return a;
 }
 
-function updateStats() {
-  const launchCount = Math.min(DEV_QUESTION_LIMIT, allQuestions.length);
-  setStats.textContent = `Доступно з ключами: ${allQuestions.length}. Для розробки запускається: ${launchCount} питань.`;
+function buildStudentLabel() {
+  const name = studentNameInput.value.trim();
+  const surname = studentSurnameInput.value.trim();
+  const company = companyNumberInput.value.trim();
+  const platoon = platoonNumberInput.value.trim();
+
+  const fullName = [surname, name].filter(Boolean).join(" ").trim() || "Без імені";
+  const unitParts = [];
+  if (company) {
+    unitParts.push(`рота ${company}`);
+  }
+  if (platoon) {
+    unitParts.push(`взвод ${platoon}`);
+  }
+  const suffix = unitParts.length ? ` (${unitParts.join(", ")})` : "";
+  return `${fullName}${suffix}`.slice(0, 64);
 }
 
 function renderQuestion() {
@@ -194,7 +209,7 @@ async function finishQuiz() {
   const pct = Math.round((score / scoredQuestions) * 100);
   resultText.textContent = `Результат: ${score} / ${scoredQuestions} (${pct}%).`;
 
-  const studentName = studentNameInput.value.trim() || "Без імені";
+  const studentName = buildStudentLabel();
   const saveResult = await saveAttempt({
     student_name: studentName,
     quiz_set_title: currentSetTitle,
@@ -240,24 +255,45 @@ async function init() {
   initSupabase();
 
   const savedName = localStorage.getItem("quiz_student_name");
+  const savedSurname = localStorage.getItem("quiz_student_surname");
+  const savedCompany = localStorage.getItem("quiz_company_number");
+  const savedPlatoon = localStorage.getItem("quiz_platoon_number");
   if (savedName) {
     studentNameInput.value = savedName;
+  }
+  if (savedSurname) {
+    studentSurnameInput.value = savedSurname;
+  }
+  if (savedCompany) {
+    companyNumberInput.value = savedCompany;
+  }
+  if (savedPlatoon) {
+    platoonNumberInput.value = savedPlatoon;
   }
 
   studentNameInput.addEventListener("change", () => {
     localStorage.setItem("quiz_student_name", studentNameInput.value.trim());
+  });
+  studentSurnameInput.addEventListener("change", () => {
+    localStorage.setItem("quiz_student_surname", studentSurnameInput.value.trim());
+  });
+  companyNumberInput.addEventListener("change", () => {
+    localStorage.setItem("quiz_company_number", companyNumberInput.value.trim());
+  });
+  platoonNumberInput.addEventListener("change", () => {
+    localStorage.setItem("quiz_platoon_number", platoonNumberInput.value.trim());
   });
 
   try {
     const res = await fetch(DATA_URL);
     dataset = await res.json();
   } catch (err) {
-    setStats.textContent = `Не вдалося завантажити ${DATA_URL}. Запустіть локальний сервер.`;
+    alert(`Не вдалося завантажити ${DATA_URL}. Запустіть локальний сервер.`);
     return;
   }
 
   if (!dataset.sets || !dataset.sets.length) {
-    setStats.textContent = "Набори питань не знайдено.";
+    alert("Набори питань не знайдено.");
     return;
   }
 
@@ -268,7 +304,6 @@ async function init() {
         .map((q) => ({ ...q, setTitle: setItem.title }))
     );
 
-  updateStats();
   startBtn.addEventListener("click", startQuiz);
   submitBtn.addEventListener("click", submitCurrent);
   nextBtn.addEventListener("click", nextQuestion);
